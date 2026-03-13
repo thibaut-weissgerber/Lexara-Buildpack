@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
-set -eo pipefail
+set -euo pipefail
 
-exit 1
+echo "Lexara tools buildpack"
+exit 0
