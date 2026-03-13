@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+readonly TRIVY_VERSION="0.69.3"
+
 BUILD_DIR="$1"
 CACHE_DIR="$2"
 ENV_DIR="$3"
@@ -13,30 +15,19 @@ mkdir -p "$INSTALL_DIR"
 echo "Installing tools into $INSTALL_DIR"
 
 # enry via Go
-if command -v go >/dev/null 2>&1; then
-  GOBIN="$INSTALL_DIR" go install github.com/go-enry/go-enry/v2/cmd/enry@v2.9.1
-else
-  echo "go is required to install enry"
-  exit 1
-fi
+GOBIN="$INSTALL_DIR" GOFLAGS='' go install github.com/go-enry/go-enry/v2/cmd/enry@v2.9.1
 
 # trivy
-curl -fsSL \
-  https://github.com/aquasecurity/trivy/releases/download/v0.51.2/trivy_0.51.2_Linux-64bit.tar.gz \
-  -o /tmp/trivy.tar.gz
-tar -xzf /tmp/trivy.tar.gz -C /tmp
-cp /tmp/trivy "$INSTALL_DIR/trivy"
+curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b "${INSTALL_DIR}" "v${TRIVY_VERSION}"
 chmod +x "$INSTALL_DIR/trivy"
 
 # semgrep
-python3 -m pip install --no-cache-dir semgrep
-if command -v semgrep >/dev/null 2>&1; then
-  cp "$(command -v semgrep)" "$INSTALL_DIR/semgrep"
-  chmod +x "$INSTALL_DIR/semgrep"
-else
-  echo "semgrep install failed"
-  exit 1
-fi
+curl https://bootstrap.pypa.io/get-pip.py > get-pip.py
+python3 get-pip.py --break-system-packages
+python3 -m pip install --no-cache-dir semgrep --break-system-packages
+cp "$HOME/.local/bin/pysemgrep" "$INSTALL_DIR/pysemgrep"
+cp "$HOME/.local/bin/semgrep" "$INSTALL_DIR/semgrep"
+chmod +x "$INSTALL_DIR/semgrep"
 
 cat > "$BUILD_DIR/.profile.d/custom-tools.sh" <<'EOF'
 export PATH="$HOME/vendor/bin:$PATH"
