@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+BUILD_DIR="$1"
+CACHE_DIR="$2"
+ENV_DIR="$3"
+
+mkdir -p "$BUILD_DIR/.profile.d"
+mkdir -p "$BUILD_DIR/vendor/bin"
+
+export INSTALL_DIR="$BUILD_DIR/vendor/bin"
+
+echo "Installing tools into $INSTALL_DIR"
+
+# Example: semgrep via pip
+python3 -m pip install --no-cache-dir --target /tmp/semgrep-tmp semgrep || true
+if command -v semgrep >/dev/null 2>&1; then
+  cp "$(command -v semgrep)" "$INSTALL_DIR/semgrep"
+fi
+
+# Example: enry binary
+curl -fsSL \
+  https://github.com/go-enry/go-enry/releases/download/v2.9.1/enry_2.9.1_linux_amd64.tar.gz \
+  -o /tmp/enry.tar.gz
+tar -xzf /tmp/enry.tar.gz -C /tmp
+cp /tmp/enry "$INSTALL_DIR/enry"
+chmod +x "$INSTALL_DIR/enry"
+
+# Example: trivy binary
+curl -fsSL \
+  https://github.com/aquasecurity/trivy/releases/download/v0.51.2/trivy_0.51.2_Linux-64bit.tar.gz \
+  -o /tmp/trivy.tar.gz
+tar -xzf /tmp/trivy.tar.gz -C /tmp
+cp /tmp/trivy "$INSTALL_DIR/trivy"
+chmod +x "$INSTALL_DIR/trivy"
+
+cat > "$BUILD_DIR/.profile.d/custom-tools.sh" <<'EOF'
+export PATH="$HOME/vendor/bin:$PATH"
+EOF
+
+echo "Done."
