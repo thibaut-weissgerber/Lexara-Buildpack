@@ -15,7 +15,7 @@ mkdir -p "$INSTALL_DIR"
 echo "Installing tools into $INSTALL_DIR"
 
 # enry via Go
-GOBIN="$INSTALL_DIR" GOFLAGS='' go install github.com/go-enry/go-enry/v2/cmd/enry@v2.9.1
+GOBIN="$INSTALL_DIR" GOFLAGS='' go install github.com/go-enry/enry@latest
 
 # trivy
 curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b "${INSTALL_DIR}" "v${TRIVY_VERSION}"
