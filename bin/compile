@@ -29,13 +29,8 @@ cp "$HOME/.local/bin/pysemgrep" "$INSTALL_DIR/pysemgrep"
 cp "$HOME/.local/bin/semgrep" "$INSTALL_DIR/semgrep"
 chmod +x "$INSTALL_DIR/semgrep"
 
-# chromium
-pnpm add puppeteer
-pnpm exec puppeteer browsers install chrome
-
 cat > "$BUILD_DIR/.profile.d/custom-tools.sh" <<'EOF'
 export PATH="$HOME/vendor/bin:$PATH"
-export PATH="$HOME/.cache/puppeteer:$PATH"
 EOF
 
 echo "Done."
