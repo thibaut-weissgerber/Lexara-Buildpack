@@ -29,6 +29,9 @@ cp "$HOME/.local/bin/pysemgrep" "$INSTALL_DIR/pysemgrep"
 cp "$HOME/.local/bin/semgrep" "$INSTALL_DIR/semgrep"
 chmod +x "$INSTALL_DIR/semgrep"
 
+# scc
+GOBIN="$INSTALL_DIR" GOFLAGS='' go install github.com/boyter/scc/v3@latest
+
 cat > "$BUILD_DIR/.profile.d/custom-tools.sh" <<'EOF'
 export PATH="$HOME/vendor/bin:$PATH"
 EOF
